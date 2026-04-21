@@ -3,7 +3,6 @@ import json
 import chromadb
 import os
 import numpy as np
-from dotenv import load_dotenv
 from openai import OpenAI
 import fitz
 
@@ -11,8 +10,7 @@ import fitz
 # =========================
 # INIT
 # =========================
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 TOP_K = 3
 EMBED_MODEL = "text-embedding-3-large"
@@ -33,7 +31,7 @@ def load_system():
     chroma_client = chromadb.PersistentClient(path="./chroma_db")
     collection = chroma_client.get_or_create_collection("tutorial_chunks")
 
-    if collection.count() == 0:
+    if False::
         print("🚀 Baue neue Chroma Collection...")
         docs = []
         ids = []
@@ -261,7 +259,7 @@ def render_pdf_page(pdf_path, page_number):
 # =========================
 # UI
 # =========================
-st.title("📘 Multimodaler Tutorial Assistant")
+st.title("🔧 Revit MEP Knowledge Assistant")
 
 query = st.text_input("Stelle eine Frage zum Handbuch")
 
@@ -282,7 +280,8 @@ if query:
             path = image["path"]
 
             if path not in shown:
-                st.image(path)
+                if os.path.exists(path):
+                    st.image(path)
                 shown.add(path)
 
 
