@@ -5,18 +5,51 @@ import os
 import numpy as np
 from openai import OpenAI
 import fitz
+import requests
+import zipfile
+import shutil
 
 
 # =========================
 # INIT
 # =========================
+
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 TOP_K = 3
 EMBED_MODEL = "text-embedding-3-large"
 GPT_MODEL = "gpt-4.1-mini"
 
+@st.cache_resource
+def download_assets():
 
+    files = {
+        "chroma_db.zip": "https://huggingface.co/datasets/LenaGeller/revit/resolve/main/chroma_db.zip",
+        "cropped_images.zip": "https://huggingface.co/datasets/LenaGeller/revit/resolve/main/cropped_images.zip",
+        "revit_mep_2011_user_guide_deu.pdf": "https://huggingface.co/datasets/LenaGeller/revit/resolve/main/revit_mep_2011_user_guide_deu.pdf"
+    }
+
+    for filename, url in files.items():
+
+        target_exists = (
+            os.path.exists(filename.replace(".zip", ""))
+            if filename.endswith(".zip")
+            else os.path.exists(filename)
+        )
+
+        if target_exists:
+            continue
+
+        st.write(f"⬇️ Lade {filename} ...")
+
+        r = requests.get(url, stream=True)
+        with open(filename, "wb") as f:
+            shutil.copyfileobj(r.raw, f)
+
+        if filename.endswith(".zip"):
+            with zipfile.ZipFile(filename, "r") as zip_ref:
+                zip_ref.extractall(".")
+                
 # =========================
 # DATA LOAD
 # =========================
@@ -31,11 +64,9 @@ def load_system():
     chroma_client = chromadb.PersistentClient(path="./chroma_db")
     collection = chroma_client.get_or_create_collection("tutorial_chunks")
 
-    if False::
-        print("🚀 Baue neue Chroma Collection...")
-        docs = []
-        ids = []
-        metas = []
+    if collection.count() == 0:
+        st.error("Chroma Datenbank leer.")
+        st.stop()
 
         for i, chunk in enumerate(chunks):
             context = chunk["context"]
@@ -71,7 +102,7 @@ def load_system():
 
     return chunks, image_map, collection
 
-
+download_assets()
 chunks, image_map, collection = load_system()
 
 
