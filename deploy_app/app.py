@@ -42,13 +42,15 @@ def download_assets():
 
         st.write(f"⬇️ Lade {filename} ...")
 
-        r = requests.get(url, stream=True)
+        r = requests.get(url, stream=True, timeout=120)
+        r.raise_for_status()
         with open(filename, "wb") as f:
             shutil.copyfileobj(r.raw, f)
 
         if filename.endswith(".zip"):
             with zipfile.ZipFile(filename, "r") as zip_ref:
                 zip_ref.extractall(".")
+            os.remove(filename)
                 
 # =========================
 # DATA LOAD
@@ -65,40 +67,8 @@ def load_system():
     collection = chroma_client.get_or_create_collection("tutorial_chunks")
 
     if collection.count() == 0:
-        st.error("Chroma Datenbank leer.")
+        st.error("Chroma Datenbank leer oder nicht korrekt entpackt.")
         st.stop()
-
-        for i, chunk in enumerate(chunks):
-            context = chunk["context"]
-            path = chunk["metadata"]["section_path"]
-
-            docs.append(" > ".join(path) + "\n" + context)
-            ids.append(f"chunk_{i}")
-            metas.append({"idx": i})
-
-        print(f"📦 Erzeuge {len(docs)} Embeddings...")
-
-        def batched(iterable, batch_size=100):
-            for i in range(0, len(iterable), batch_size):
-                yield iterable[i:i + batch_size]
-
-        embeddings = []
-        for batch_docs in batched(docs, batch_size=100):
-            resp = client.embeddings.create(
-                model=EMBED_MODEL,
-                input=batch_docs
-            )
-            batch_embs = [item.embedding for item in resp.data]
-            embeddings.extend(batch_embs)
-
-        collection.add(
-            ids=ids,
-            documents=docs,
-            embeddings=embeddings,
-            metadatas=metas
-        )
-
-        print("✅ Collection erfolgreich gespeichert")
 
     return chunks, image_map, collection
 
