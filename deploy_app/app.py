@@ -225,40 +225,53 @@ def generate_answer(query, retrieved_chunks):
 
     full_context = "\n\n".join(context_parts)
 
-    response = client.chat.completions.create(
-        model=GPT_MODEL,
-        temperature=0,
-        messages=[
-            
-     {
-    "role": "system",
-    "content": """
-Du bist ein rein extraktiver Dokumentations-Assistent.
+    system_prompt = """
+Du bist ein technischer Dokumentations-Assistent.
 
-Du darfst ausschließlich Sätze oder Satzteile aus dem bereitgestellten Kontext verwenden.
+Nutze ausschließlich Informationen aus dem bereitgestellten Kontext.
 
 Regeln:
-- Keine eigenen Formulierungen.
-- Keine Zusammenfassungen aus Allgemeinwissen.
-- Keine erfundenen Zwischenschritte.
-- Keine Interpretation.
-- Wenn im Kontext konkrete Schritte stehen, gib genau diese Schritte wieder.
-- Übernimm Tastenkombinationen, Buttonnamen und Fensternamen exakt.
-- Wenn der Kontext eine Überschrift enthält, antworte mit den darunterstehenden relevanten Sätzen.
-- Maximal 5 Punkte.
+- Erfinde nichts.
+- Nutze keine Informationen aus allgemeinem Wissen.
+- Antworte nur aus dem Kontext.
+- Wenn im Kontext konkrete Schritte stehen, gib diese Schritte vollständig wieder.
+- Übernimm Tastenkombinationen, Buttonnamen, Fensternamen und Begriffe exakt.
+- Bevorzuge Originalsätze aus dem Kontext.
+- Du darfst Sätze nur leicht kürzen oder verbinden, aber keine neuen Inhalte hinzufügen.
+- Wenn eine Überschrift zur Frage passt, nutze den Text unter dieser Überschrift.
 - Wenn keine passende Information im Kontext steht, antworte exakt: "Nicht im Kontext enthalten."
+- Antworte kompakt in maximal 5 Punkten.
+- Keine allgemeinen Autodesk-, Revit- oder Software-Erklärungen.
 """
 
-            },
-            {
-                "role": "user",
-                "content":
-                f"Frage: {query}\n\nKontext:\n{full_context}"
-            }
-        ]
-    )
+user_prompt = f"""
+FRAGE:
+{query}
 
-    return response.choices[0].message.content
+KONTEXT:
+{full_context}
+
+AUFGABE:
+Beantworte die Frage ausschließlich mit Informationen aus dem KONTEXT.
+Wenn der Kontext einen passenden Abschnitt enthält, gib die relevanten Schritte und Hinweise daraus wieder.
+"""
+
+response = client.chat.completions.create(
+    model=GPT_MODEL,
+    temperature=0,
+    messages=[
+        {
+            "role": "system",
+            "content": system_prompt
+        },
+        {
+            "role": "user",
+            "content": user_prompt
+        }
+    ]
+)
+
+return response.choices[0].message.content
 
 # ==================================================
 # PDF PAGE
