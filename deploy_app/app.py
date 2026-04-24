@@ -232,6 +232,7 @@ def generate_answer(query, retrieved_chunks):
                 "content":
                 "Du bist ein technischer Revit Assistent. "
                 "Antworte präzise anhand des Kontexts."
+                "Nutze nur Text, der wirklich im Kontext steht."
             },
             {
                 "role": "user",
