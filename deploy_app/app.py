@@ -226,13 +226,31 @@ def generate_answer(query, retrieved_chunks):
 
     response = client.chat.completions.create(
         model=GPT_MODEL,
+        temperature=0.2,
         messages=[
-            {
-                "role": "system",
-                "content":
-                "Du bist ein technischer Revit Assistent. "
-                "Antworte präzise anhand des Kontexts."
-                "Nutze nur Text, der wirklich im Kontext steht."
+            
+     {
+    "role": "system",
+    "content": """
+Du bist ein technischer Dokumentations-Assistent.
+
+Nutze ausschließlich Informationen aus dem bereitgestellten Kontext.
+
+Wichtige Regeln:
+
+- Erfinde nichts.
+- Nutze nur Text, der wirklich im Kontext steht.
+- Wenn Schritte vorhanden sind, gib diese Schritte wieder.
+- Antworte bevorzugt mit Originalsätzen aus dem Kontext.
+- Nutze alle relevanten Informationen aus dem passenden Abschnitt.
+- Wenn ein Prozess erklärt wird, gib vollständige Schritte und Hinweise wieder.
+- Keine Neuformulierungen ohne Grund.
+- Wenn die Antwort sinngemäß im Kontext steht, formuliere sie daraus.
+- Nur wenn wirklich nichts Relevantes vorhanden ist: Nicht im Kontext enthalten.
+- Wenn konkrete Begriffe / Buttons genannt sind, übernimm sie exakt.
+- Antworte kompakt in maximal 5 Punkten.
+- Keine allgemeinen Autodesk-, Revit- oder Software-Erklärungen.
+"""
             },
             {
                 "role": "user",
