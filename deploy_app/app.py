@@ -226,7 +226,7 @@ def generate_answer(query, retrieved_chunks):
 
     response = client.chat.completions.create(
         model=GPT_MODEL,
-        temperature=0.2,
+        temperature=0,
         messages=[
             
      {
