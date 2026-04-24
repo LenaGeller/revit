@@ -244,7 +244,7 @@ Regeln:
 - Keine allgemeinen Autodesk-, Revit- oder Software-Erklärungen.
 """
 
-user_prompt = f"""
+    user_prompt = f"""
 FRAGE:
 {query}
 
