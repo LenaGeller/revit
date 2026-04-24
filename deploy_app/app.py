@@ -216,10 +216,11 @@ def generate_answer(query, retrieved_chunks):
 
     for item in retrieved_chunks:
 
-        path = item["chunk"]["metadata"]["section_path"]
+        chunk = item["chunk"]
+        path = chunk["metadata"]["section_path"]
 
         context_parts.append(
-            f"SECTION: {' > '.join(path)}\n{item['best_passage']}"
+            f"SECTION: {' > '.join(path)}\n{chunk['context']}"
         )
 
     full_context = "\n\n".join(context_parts)
