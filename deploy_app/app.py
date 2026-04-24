@@ -256,22 +256,22 @@ Beantworte die Frage ausschließlich mit Informationen aus dem KONTEXT.
 Wenn der Kontext einen passenden Abschnitt enthält, gib die relevanten Schritte und Hinweise daraus wieder.
 """
 
-response = client.chat.completions.create(
-    model=GPT_MODEL,
-    temperature=0,
-    messages=[
-        {
-            "role": "system",
-            "content": system_prompt
-        },
-        {
-            "role": "user",
-            "content": user_prompt
-        }
-    ]
-)
-
-return response.choices[0].message.content
+    response = client.chat.completions.create(
+        model=GPT_MODEL,
+        temperature=0,
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": user_prompt
+            }
+        ]
+    )
+    
+    return response.choices[0].message.content
 
 # ==================================================
 # PDF PAGE
