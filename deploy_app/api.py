@@ -10,7 +10,6 @@ from fastapi.responses import Response
 import dotenv
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 dotenv.load_dotenv((os.path.join(BASE_DIR, ".env")))
-print("KEY FOUND:", os.getenv("OPENAI_API_KEY") is not None)
 
 
 
@@ -199,7 +198,8 @@ def ask(request: AskRequest):
         for image in results[0]["images"]:
             images.append({
                 "image_id": image["image_id"],
-                "path": image["path"]
+                "path": image["path"],
+                "page": image.get("page")
             })
 
     return {
