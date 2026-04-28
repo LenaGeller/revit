@@ -1,7 +1,9 @@
 import streamlit as st
 import requests
+import os
 
-API_URL = "http://127.0.0.1:8001/ask"
+API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8001")
+API_URL = f"{API_BASE_URL}/ask"
 
 st.title("🔧 Revit MEP Knowledge Assistant")
 st.caption("Frontend → FastAPI Backend → RAG/LLM Pipeline")
@@ -62,7 +64,7 @@ if query:
 
                     with st.expander(label):
                         pdf_response = requests.get(
-                            f"http://127.0.0.1:8001/pdf-page/{page_start}",
+                            f"{API_BASE_URL}/pdf-page/{page_start}",
                             params={"source_doc": source_doc},
                             timeout=120
                         )
